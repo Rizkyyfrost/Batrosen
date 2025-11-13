@@ -1,422 +1,143 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Batrosen – Rawamangun</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PKSel - Footstep Energy</title>
   <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1e40af;
-      --secondary: #34c759;
-      --accent: #a13658;
-      --light-bg: #f0f7ff;
-      --card-bg: #ffffff;
-      --text: #1f2937;
-      --text-light: #6b7280;
-      --shadow: 0 10px 24px rgba(0,0,0,0.1);
-      --radius: 16px;
+    :root{
+      --bg:#f6f7fb; --card:#ffffff; --muted:#9aa3ad; --accent:#24d37e; --glass: rgba(255,255,255,0.6);
+      --danger:#ff6b6b; --soft:#eef3f8; --shadow: 0 6px 18px rgba(27,38,59,0.08);
     }
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:#eaf1f8; color:#17212b}.app{max-width:420px;margin:18px auto;padding:14px}
+header{display:flex;align-items:center;gap:10px}
+header h1{font-size:20px;margin:0;font-weight:600}
+.loc{margin-left:auto;background:linear-gradient(90deg,#fff,#f7fbff);padding:6px 10px;border-radius:999px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);box-shadow:var(--shadow)}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+.meta{display:flex;justify-content:space-between;margin:12px 0;color:var(--muted);font-size:13px}
 
-    html, body { 
-      height: 100%; 
-      margin: 0; 
-      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
-      color: var(--text);
-    }
-    
-    /* App jadi stacking context */
-    #app {
-      position: relative;
-      height: 100vh;
-      width: 100%;
-      overflow: hidden;
-      background: var(--light-bg);
-    }
-    
-    /* MAP AREA */
-    #map {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-    }
+.hero{position:relative;border-radius:12px;overflow:hidden;height:160px;background-image:url('gambar1.png');background-size:cover;background-position:center}
+.overlay{position:absolute;inset:0;background:rgba(10,20,40,0.45)}
+.weather{position:absolute;left:12px;top:12px;background:rgba(255,255,255,0.12);backdrop-filter:blur(6px);padding:6px 10px;border-radius:8px;color:#fff;font-weight:600;display:flex;align-items:center;gap:8px;z-index:2}
+.today{position:absolute;left:18px;bottom:18px;color:#fff;z-index:2}
+.today small{display:block;font-size:13px;opacity:0.9}
+.today .whr{font-size:36px;font-weight:700;margin-top:6px;display:flex;align-items:center;gap:10px}
+.hero .sub{position:absolute;right:18px;bottom:18px;color:rgba(255,255,255,0.9);font-size:13px;text-align:right;z-index:2}
 
-    /* SHEET DI ATAS MAP */
-    .sheet {
-      position: absolute;
-      left: 0; 
-      right: 0;
-      bottom: 88px;
-      width: 92%;
-      max-width: 500px;
-      margin: 0 auto;
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      z-index: 2000;
-      pointer-events: auto;
-      transition: transform 0.3s ease-out;
-    }
-    
-    .sheet.collapsed {
-      transform: translateY(calc(100% - 120px));
-    }
-    
-    .sheet-handle {
-      width: 40px;
-      height: 5px;
-      background: #ddd;
-      border-radius: 3px;
-      margin: 0 auto 10px;
-      cursor: pointer;
-    }
-    
-    .tag {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--accent);
-      background: #ffe6ee;
-      padding: 6px 12px;
-      border-radius: 14px;
-      display: inline-block;
-      margin-bottom: 8px;
-    }
-    
-    .title {
-      font-size: 20px;
-      font-weight: 700;
-      margin: 8px 0;
-      color: var(--text);
-    }
-    
-    .desc {
-      font-size: 14px;
-      color: var(--text-light);
-      margin-bottom: 16px;
-      line-height: 1.5;
-    }
+.flow{margin-top:18px;background:var(--card);border-radius:12px;padding:18px;box-shadow:var(--shadow)}
+.flow-row{display:flex;align-items:center;justify-content:space-between}
+.device{display:flex;flex-direction:column;align-items:center;gap:10px;flex:1}
+.icon-wrap{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--soft),#fff);box-shadow:inset 0 -6px 12px rgba(0,0,0,0.03)}
+.center{flex:1;display:flex;flex-direction:column;align-items:center}
+.center .screen{width:120px;height:86px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#f4f9ff);box-shadow:0 8px 18px rgba(10,30,60,0.06);border:1px solid #e6eff8}
+.label{font-size:13px;color:var(--muted)}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 16px;
-    }
-    
-    .card {
-      background: #f9fbff;
-      border-radius: 12px;
-      padding: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.05);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 12px rgba(0,0,0,.1);
-    }
-    
-    .label {
-      font-size: 11px;
-      color: var(--text-light);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 500;
-    }
-    
-    .value {
-      font-weight: 600;
-      font-size: 14px;
-      margin-top: 6px;
-      color: var(--text);
-    }
-    
-    .bar {
-      width: 100%;
-      height: 8px;
-      background: #e6edff;
-      border-radius: 6px;
-      overflow: hidden;
-      margin: 8px 0;
-    }
-    
-    .bar span {
-      display: block;
-      height: 100%;
-      width: 68%;
-      background: linear-gradient(90deg, #76a6ff, var(--primary));
-      border-radius: 6px;
-      transition: width 1s ease-in-out;
-    }
+.battery{margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center}
+.battery .bat{width:54px;height:36px;border-radius:6px;border:2px solid #dfeef7;display:flex;align-items:center;justify-content:center;font-weight:700}
+.battery .pct{font-weight:700}
 
-    /* BADGE LOKASI */
-    .pill {
-      position: absolute; 
-      top: 14px; 
-      left: 50%; 
-      transform: translateX(-50%);
-      background: var(--secondary); 
-      color: #fff; 
-      border-radius: 16px; 
-      padding: 10px 18px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.15); 
-      z-index: 2000; 
-      font-weight: 600; 
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .pill i {
-      font-size: 12px;
-    }
+.stats{display:flex;gap:8px;justify-content:space-between;margin-top:12px;color:var(--muted);font-size:13px}
 
-    /* NAV BAR */
-    .nav {
-      position: absolute; 
-      left: 0; 
-      right: 0; 
-      bottom: 0;
-      height: 74px; 
-      background: var(--primary-dark); 
-      color: #fff;
-      border-top-left-radius: 20px; 
-      border-top-right-radius: 20px;
-      display: flex; 
-      justify-content: space-around; 
-      align-items: center;
-      z-index: 2100;
-      padding: 0 10px;
-    }
-    
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 8px 16px;
-      border-radius: 12px;
-      transition: background 0.2s;
-      cursor: pointer;
-    }
-    
-    .nav-item.active {
-      background: rgba(255, 255, 255, 0.15);
-    }
-    
-    .nav-item i {
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
-    
-    .nav-item span {
-      font-size: 12px;
-      font-weight: 500;
-    }
+footer{margin-top:18px;display:flex;gap:12px;align-items:center}
+.chip{flex:1;background:linear-gradient(90deg,#fff,#fbfdff);padding:10px;border-radius:10px;box-shadow:var(--shadow);font-size:13px}
 
-    /* Biar teks tetap kebaca di atas peta terang */
-    .fade-top, .fade-bottom {
-      position: absolute; 
-      left: 0; 
-      right: 0; 
-      z-index: 1000; 
-      pointer-events: none;
-    }
-    
-    .fade-top {
-      top: 0;
-      height: 120px;
-      background: linear-gradient(180deg, rgba(0,0,0,.2), transparent);
-    }
-    
-    .fade-bottom {
-      bottom: 74px;
-      height: 120px;
-      background: linear-gradient(0deg, rgba(0,0,0,.15), transparent);
-    }
-    
-    /* Marker custom untuk peta */
-    .custom-marker {
-      background: var(--primary);
-      border: 3px solid white;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-    
-    /* Responsivitas */
-    @media (max-width: 480px) {
-      .sheet {
-        width: 96%;
-        padding: 16px;
-      }
-      
-      .grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-      
-      .title {
-        font-size: 18px;
-      }
-      
-      .pill {
-        font-size: 13px;
-        padding: 8px 16px;
-      }
-    }
-    
-    /* Animasi */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .sheet {
-      animation: fadeIn 0.5s ease-out;
-    }
-    
-    .card {
-      animation: fadeIn 0.5s ease-out backwards;
-    }
-    
-    .card:nth-child(1) { animation-delay: 0.1s; }
-    .card:nth-child(2) { animation-delay: 0.2s; }
-    .card:nth-child(3) { animation-delay: 0.3s; }
+@media (max-width:420px){.app{padding:12px}}
+
+.mini{font-size:12px;color:var(--muted)}
+.badge{display:inline-block;padding:6px 10px;background:#fff;border-radius:999px;border:1px solid #eef4fb;font-weight:600;font-size:13px}
+
   </style>
 </head>
 <body>
-<div id="app">
-  <div id="map"></div>
-
-  <!-- overlay bantu kontras -->
-  <div class="fade-top"></div>
-  <div class="fade-bottom"></div>
-
-  <!-- badge lokasi -->
-  <div class="pill">
-    <i class="fas fa-map-marker-alt"></i>
-    Life Location Batrosen
-  </div>
-
-  <!-- sheet konten -->
-  <section class="sheet" aria-label="Pengenalan Batrosen">
-    <div class="sheet-handle"></div>
-    <span class="tag">Pengenalan Batrosen</span>
-    <h2 class="title">Tentang Batrosen</h2>
-    <p class="desc">
-      Batrosen adalah modul pemantauan air sederhana untuk kebutuhan internal.
-      Menampilkan ringkas: <strong>Tanggal</strong>, <strong>Kapasitas Air</strong>,
-      dan <strong>Catatan Penggunaan</strong>.
-    </p>
-
-    <div class="grid">
-      <div class="card">
-        <div class="label"><i class="fas fa-calendar"></i> Tanggal</div>
-        <div class="value">26 Agustus 2025</div>
-      </div>
-      <div class="card">
-        <div class="label"><i class="fas fa-tint"></i> Kapasitas Air</div>
-        <div class="bar"><span></span></div>
-        <div class="value">68%</div>
-      </div>
-      <div class="card">
-        <div class="label"><i class="fas fa-clipboard"></i> Catatan</div>
-        <div class="value">Pemakaian normal</div>
-      </div>
-    </div>
-    
-    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-      <div class="label"><i class="fas fa-history"></i> Riwayat Terbaru</div>
-      <div class="value" style="font-size: 13px; margin-top: 8px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-          <span>Hari ini, 08:30</span>
-          <span>+150L</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span>Kemarin, 18:45</span>
-          <span>+320L</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- bottom nav -->
-  <nav class="nav" aria-label="Navigasi">
-    <div class="nav-item active">
-      <i class="fas fa-home"></i>
-      <span>Beranda</span>
-    </div>
-    <div class="nav-item">
-      <i class="fas fa-inbox"></i>
-      <span>Kotak Masuk</span>
-    </div>
-    <div class="nav-item">
-      <i class="fas fa-filter"></i>
-      <span>Filter</span>
-    </div>
-    <div class="nav-item">
-      <i class="fas fa-user"></i>
-      <span>Profil</span>
-    </div>
-  </nav>
+  <div class="app">
+    <header>
+      <h1>PKSel RIZ20</h1>
+      <div class="loc">📍 Kecamatan Tanjung Priok</div>
+    </header><div class="meta">
+  <div><span class="mini">Energi Footstep</span><div style="font-weight:700">7.1kWp</div></div>
+  <div style="text-align:right"><div class="mini">Installation date</div><div style="font-weight:700">13-11-2025</div></div>
 </div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  // Koordinat Rawamangun, Jakarta Timur
-  const RAWAMANGUN = [-6.1951, 106.8854];
+<section class="hero">
+  <div class="overlay"></div>
+  <div class="weather">☁️ Cloudy, 32.0°C</div>
+  <div class="today">
+    <small>Today(Whr)</small>
+    <div class="kwh">⚡ 228.3</div>
+  </div>
+  <div class="sub">
+    <div style="font-size:13px;opacity:0.95">Generation This Month(kWh)</div>
+    <div style="font-weight:700;font-size:18px;margin-top:4px">39.5</div>
+  </div>
+</section>
 
-  const map = L.map('map', {
-    zoomControl: false,
-    attributionControl: false
-  }).setView(RAWAMANGUN, 15);
+<section class="flow">
+  <div class="flow-row">
+    <div class="device">
+      <div class="icon-wrap" title="Penyaring Paku">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 5h18M6 12h12M9 19h6" stroke="#274156" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+          <circle cx="5" cy="5" r="1.4" fill="#274156" opacity="0.85"/>
+          <circle cx="12" cy="12" r="1.4" fill="#274156" opacity="0.85"/>
+          <circle cx="19" cy="19" r="1.4" fill="#274156" opacity="0.85"/>
+        </svg>
+      </div>
+      <div class="label">Penyaring Paku</div>
+      <div class="mini">Filtering spikes for safety</div>
+    </div>
 
-  // Layer OSM
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-  }).addTo(map);
+    <div class="center">
+      <div class="screen">
+        <div style="text-align:center">
+          <div style="font-weight:700;font-size:18px">Load</div>
+          <div id="loadValue" style="font-size:13px;color:var(--muted);margin-top:6px">335W / 1442VA</div>
+        </div>
+      </div>
+      <div class="battery">
+        <div class="bat">🔋</div>
+        <div class="pct">Battery: <strong>100.0%</strong></div>
+      </div>
+      <div class="stats">
+        <div>Import from Grid: <strong>0.0W</strong></div>
+        <div>Discharging Power: <strong>1008W</strong></div>
+      </div>
+    </div>
 
-  // Marker custom untuk lokasi
-  const customIcon = L.divIcon({
-    className: 'custom-marker',
-    iconSize: [30, 30]
-  });
-  
-  L.marker(RAWAMANGUN, {icon: customIcon})
-    .addTo(map)
-    .bindPopup('<strong>Batrosen Rawamangun</strong><br>Jl. Rawamangun Selatan<br>Jakarta Timur');
+    <div class="device">
+      <div class="icon-wrap" title="Energi Footstep">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 20c-.5-2 1-4 3-5s4-1 6-1c1 0 2 0 3 1" stroke="#1b6b4a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <ellipse cx="6" cy="10" rx="2.4" ry="3.4" fill="#1b6b4a" opacity="0.95"/>
+          <ellipse cx="14" cy="7" rx="2.8" ry="3.8" fill="#1b6b4a" opacity="0.95"/>
+        </svg>
+      </div>
+      <div class="label">Energi Footstep</div>
+      <div class="mini">Generated by steps (simulated)</div>
+    </div>
+  </div>
 
-  // Tambah kontrol zoom di pojok kanan bawah
-  L.control.zoom({ position: 'bottomright' }).addTo(map);
-  
-  // Interaktivitas sheet
-  const sheet = document.querySelector('.sheet');
-  const sheetHandle = document.querySelector('.sheet-handle');
-  let isSheetCollapsed = false;
-  
-  sheetHandle.addEventListener('click', function() {
-    isSheetCollapsed = !isSheetCollapsed;
-    sheet.classList.toggle('collapsed', isSheetCollapsed);
-  });
-  
-  // Simulasi perubahan data kapasitas air (hanya demonstrasi)
-  setTimeout(function() {
-    const waterBar = document.querySelector('.bar span');
-    waterBar.style.width = '75%';
-    document.querySelector('.card:nth-child(2) .value').textContent = '75%';
-  }, 2000);
-</script>
+  <div style="margin-top:16px;display:flex;gap:10px;align-items:center;justify-content:space-between">
+    <div class="chip"><span class="badge">Growatt 01</span> <div style="font-weight:700;margin-top:6px">Mode: Battery Discharging</div></div>
+    <div style="width:120px;text-align:center">
+      <div style="font-weight:700;font-size:18px">Ppv: 24.0W</div>
+      <div class="mini">(footstep sensor AutoONOFF)</div>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  <div class="chip">Generation overview <div style="font-size:12px;color:var(--muted)">Today / Total (kWh)</div></div>
+  <div class="chip">Status <div style="font-size:12px;color:var(--muted)">All systems nominal</div></div>
+</footer>
+
+  </div>
+  <script>
+    function randomLoad(){
+      const load = Math.floor(Math.random()*500 + 300);
+      document.getElementById('loadValue').innerText = `${load}W / 1442VA`;
+    }
+    setInterval(randomLoad, 1500);
+  </script>
 </body>
-      </html>
+                                                              </html>
